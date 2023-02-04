@@ -1,0 +1,23 @@
+---
+parameters: []
+definitions:
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+      user_name:
+        type: string
+      permission:
+        type: string
+        enum: ['MODERATE', 'ADMIN', 'USER']
+responses:
+  200:
+    description: Returns a user
+    schema:
+      $ref: '#/definitions/User'
+    examples:
+      user: {"id": 14,
+            "user_name": "aidar123@mail.ru",
+            "permission": "MODERATE"
+      }

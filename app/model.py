@@ -15,14 +15,16 @@ class Permissions(Enum):
 class User(db.Model, UserMixin):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_name = db.Column(db.String(70), unique=True)
+    email = db.Column(db.String(70), unique=True)
     password = db.Column(db.Text)
+    username = db.Column(db.String(20))
     permission = db.Column(db.Enum(Permissions))
     created_date = db.Column(db.DateTime(timezone=True), nullable=False)
 
 
-    def __init__(self, name, password, permission=Permissions.USER):
-        self.user_name = name
+    def __init__(self, email, password, username=None, permission=Permissions.USER):
+        self.email = email
+        self.username = username
         self.hash_password(password)
         self.permission = permission
 
@@ -40,12 +42,14 @@ class User(db.Model, UserMixin):
 
     def to_json(self):
         return {'id': self.id,
-                'user_name': self.user_name,
+                'email': self.email,
+                'username': self.username,
                 'permission': self.permission.value}
 
     @staticmethod
     def from_json(_dict: dict):
-        return User(name=_dict.get('user_name'),
+        return User(email=_dict.get('email'),
+                    username=_dict.get('username'),
                     password=_dict.get('password'),
                     permission=Permissions.__getitem__(_dict.get('permission')))
 
@@ -55,5 +59,5 @@ def add_created_date(mapper, connection, target):
     target.created_date = moment.create(datetime.utcnow()).timestamp
 @event.listens_for(User, "before_insert")
 def lowercase(mapper, connection, target):
-    target.user_name = target.user_name.lower()
+    target.email = target.email.lower()
 

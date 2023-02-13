@@ -2,7 +2,7 @@ import os
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY') or os.urandom(32)
+    SECRET_KEY = os.getenv('SECRET_KEY') or 'dsdsadasdsadasdasdasdasd'
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS') or False
 
 

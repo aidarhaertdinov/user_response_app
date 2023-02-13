@@ -7,12 +7,31 @@ from flask_login import login_user, logout_user, login_required
 from ... import login_manager
 from ...registration_login_entity import RegistrationLoginEntity
 from ...repository.user_query_repository import user_query_filter, user_query_odrer_by
+from app import basic_auth, token_auth, multi_auth
+from config import Config
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
-#
+@basic_auth.verify_password
+def verify_password(username, password):
+    user = user_query_filter(username=username)
+    if not user or not user.verify_password(password):
+        return False
+    return user.username
+
+from ...token_manager import dict_token, create_token, add_token, decode_token
+
+@token_auth.verify_token
+def verify_token(token):
+    data = decode_token(token=token, secret_key=Config.SECRET_KEY)
+    if data['id'] in dict_token:
+        user = user_query_filter(id=data['id'])
+        return user.email
+    return False
+
 @rest_v1.route('/registration', methods=['POST'])
 def registration():
     email, password = RegistrationLoginEntity.request_json()
@@ -32,15 +51,15 @@ def login():
     if RegistrationLoginEntity.email_password_validate(email, password) is False:
         abort(400)
     user = user_query_filter(email=email)
-    if RegistrationLoginEntity.user_check_password_validate(user, password) is True:
-    # login_user(user, remember=True)
-    # token = create_token(user=user, secret_key=app.config['SECRET_KEY'])
-    # add_token(token, user)
-    # return jsonify({'email': user.email, 'token': token}), 201
-        return jsonify(user.to_json()), 201
+    if RegistrationLoginEntity.user_check_password_validate(user, password) is False:
+        abort(400)
+    token = create_token(user=user, secret_key=Config.SECRET_KEY)
+    add_token(token, user)
+    return jsonify({'token': token}), 201
 
 
 @rest_v1.route("/users", methods=['GET'])
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_users.yml')
 def get_users():
     try:
@@ -53,6 +72,7 @@ def get_users():
 
 
 @rest_v1.route("/users/<int:id>", methods=['GET'])
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_user.yml')
 def get_user(id):
     try:
@@ -78,13 +98,14 @@ def get_user(id):
 
 
 @rest_v1.route("/users/<int:id>", methods=['PUT'])
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/put_user.yml')
 def put_user(id):
     try:
         email, password = RegistrationLoginEntity.request_json()
         user = user_query_filter(id=id)
         user.email = email or user.email
-        user.password = password or user.password
+        user.password_hash = password or user.password_hash
         permission = RegistrationLoginEntity.request_json_put()
         if permission:
             user.permission = permission
@@ -96,6 +117,7 @@ def put_user(id):
 
 
 @rest_v1.route("/users/<int:id>", methods=['DELETE'])
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/delete_user.yml')
 def delete_user(id):
     try:

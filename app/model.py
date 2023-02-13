@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(70), unique=True)
-    password = db.Column(db.Text)
+    password_hash = db.Column(db.Text)
     username = db.Column(db.String(20))
     permission = db.Column(db.Enum(Permissions))
     created_date = db.Column(db.DateTime(timezone=True), nullable=False)
@@ -32,10 +32,13 @@ class User(db.Model, UserMixin):
         return '<User %r>' % self.id
 
     def hash_password(self, password):
-        self.password = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
+    # def check_password(self, password):
+    #     return check_password_hash(self.password, password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     def can(self, perm):
         return self.permission is not None and self.permission == perm

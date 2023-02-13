@@ -23,7 +23,6 @@ class RegistrationLoginEntity:
             return False
 
 
-
     @staticmethod
     def email_password_validate(email: str, password: str) -> bool:
         if email is None or password is None:
@@ -33,7 +32,7 @@ class RegistrationLoginEntity:
 
     @staticmethod
     def user_check_password_validate(user: str, password: str) -> bool:
-        if user is not None and user.check_password(password):
+        if user is not None and user.verify_password(password):
             return True
         else:
             return False

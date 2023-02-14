@@ -1,6 +1,6 @@
 from . import rest_v1
 from app.model import User, db, Permissions
-from flask import jsonify, request
+from flask import jsonify, current_app
 from ..errors import errors
 from flasgger import swag_from
 from flask_login import login_user, logout_user, login_required
@@ -22,12 +22,12 @@ def verify_password(username, password):
         return False
     return user.username
 
-from ...token_manager import dict_token, create_token, add_token, decode_token
+from ...token_manager import create_token, add_token, decode_token
 
 @token_auth.verify_token
 def verify_token(token):
     data = decode_token(token=token, secret_key=Config.SECRET_KEY)
-    if data['id'] in dict_token:
+    if data['id'] in current_app.config:
         user = user_query_filter(id=data['id'])
         return user.email
     return False
@@ -55,7 +55,7 @@ def login():
         abort(400)
     token = create_token(user=user, secret_key=Config.SECRET_KEY)
     add_token(token, user)
-    return jsonify({'token': token}), 201
+    return jsonify({'id': user.id, 'token': token}), 201
 
 
 @rest_v1.route("/users", methods=['GET'])

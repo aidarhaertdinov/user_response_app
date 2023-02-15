@@ -19,6 +19,8 @@ basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth('Bearer')
 multi_auth = MultiAuth(basic_auth, token_auth)
 
+user_repository = None
+
 def create_app(config_name="development"):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -28,8 +30,13 @@ def create_app(config_name="development"):
     moment.init_app(app)
     login_manager.init_app(app)
 
+
     from app.rest.v1 import rest_v1
     csrf.exempt(rest_v1)
     app.register_blueprint(rest_v1)
+
+    from repository.user_repository import UserRepository
+    global user_repository
+    user_repository = UserRepository()
 
     return app

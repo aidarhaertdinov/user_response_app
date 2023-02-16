@@ -1,12 +1,11 @@
 from . import rest_v1
-from app.model import User, db, Permissions
-from flask import jsonify, current_app
+from app.model import User, db
+from flask import jsonify, current_app, abort
 from ..errors import errors
 from flasgger import swag_from
-from flask_login import login_user, logout_user, login_required
 from ... import login_manager
 from ...registration_login_entity import RegistrationLoginEntity
-from ...repository.user_repository import get_user_by_email, get_user_by_id, get_ordered_users
+from ...repository.user_repository import UserRepository
 from app import basic_auth, token_auth, multi_auth
 from config import Config
 
@@ -17,7 +16,7 @@ def load_user(user_id):
 
 @basic_auth.verify_password
 def verify_password(email, password):
-    user = get_user_by_email(email=email)
+    user = UserRepository.get_user_by_email(email=email)
     if not user or not user.verify_password(password):
         return False
     return user.email
@@ -28,18 +27,18 @@ from ...token_manager import create_token, add_token, decode_token
 def verify_token(token):
     data = decode_token(token=token, secret_key=Config.SECRET_KEY)
     if data['id'] in current_app.config:
-        user = get_user_by_id(id=data['id'])
-        return user.email
+        user = UserRepository.get_user_by_id(id=data['id'])
+        return user
     return False
 
 @rest_v1.route('/registration', methods=['POST'])
 def registration():
-    email, password = RegistrationLoginEntity.request_json()
-    if RegistrationLoginEntity.email_password_validate(email, password) is False:
+    data = RegistrationLoginEntity.request_json()
+    if RegistrationLoginEntity.email_password_validate(data.email, data.password) is False:
         abort(400)
-    if get_user_by_email(email=email) is not None:
+    if UserRepository.get_user_by_email(email=data.email) is not None:
             abort(400, description='Пользователь с данным email и password зарегистирован')
-    user = User(email=email, password=password)
+    user = User(email=data.email, password=data.password)
     db.session.add(user)
     db.session.commit()
 
@@ -47,11 +46,11 @@ def registration():
 
 @rest_v1.route('/login', methods=['POST'])
 def login():
-    email, password = RegistrationLoginEntity.request_json()
-    if RegistrationLoginEntity.email_password_validate(email, password) is False:
+    data = RegistrationLoginEntity.request_json()
+    if RegistrationLoginEntity.email_password_validate(data.email, data.password) is False:
         abort(400)
-    user = get_user_by_email(email=email)
-    if RegistrationLoginEntity.user_check_password_validate(user, password) is False:
+    user = UserRepository.get_user_by_email(email=data.email)
+    if RegistrationLoginEntity.user_check_password_validate(user, data.password) is False:
         abort(400)
     token = create_token(user=user, secret_key=Config.SECRET_KEY)
     add_token(token, user)
@@ -63,7 +62,7 @@ def login():
 @swag_from('swagger_schema/user_view/get_users.yml')
 def get_users():
     try:
-        users = get_ordered_users(User.id)
+        users = UserRepository.get_ordered_users(User.id)
         list_users = [user.to_json() for user in users]
         return jsonify(list_users)
 
@@ -76,25 +75,10 @@ def get_users():
 @swag_from('swagger_schema/user_view/get_user.yml')
 def get_user(id):
     try:
-        user = get_user_by_id(id=id)
+        user = UserRepository.get_user_by_id(id=id)
         return jsonify(user.to_json())
     except AttributeError:
         return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
-
-
-# @rest_v1.route("/users", methods=['POST'])
-# @swag_from('swagger_schema/user_view/post_user.yml')
-# def post_user():
-#     try:
-#         data = request.get_json()
-#         user = User.from_json(data)
-#         db.session.add(user)
-#         db.session.commit()
-#         return jsonify(user.to_json())
-#     except AttributeError:
-#         return jsonify(errors.get('PasswordNotFound')), errors.get('PasswordNotFound').get('status')
-#     except KeyError:
-#         return jsonify(errors.get('PermissionNotFound')), errors.get('PermissionNotFound').get('status')
 
 
 @rest_v1.route("/users/<int:id>", methods=['PUT'])
@@ -102,13 +86,14 @@ def get_user(id):
 @swag_from('swagger_schema/user_view/put_user.yml')
 def put_user(id):
     try:
-        email, password = RegistrationLoginEntity.request_json()
-        user = get_user_by_id(id=id)
-        user.email = email or user.email
-        user.password_hash = password or user.password_hash
-        permission = RegistrationLoginEntity.request_json_put()
-        if permission:
-            user.permission = permission
+        data = RegistrationLoginEntity.request_json()
+        user = UserRepository.get_user_by_id(id=id)
+        user.email = data.email or user.email
+        user.password_hash = data.password or user.password_hash
+        if data.permission:
+            user.permission = data.permission
+        if data.username:
+            user.username = data.username
         db.session.add(user)
         db.session.commit()
         return jsonify(user.to_json())
@@ -121,7 +106,7 @@ def put_user(id):
 @swag_from('swagger_schema/user_view/delete_user.yml')
 def delete_user(id):
     try:
-        user = get_user_by_id(id=id)
+        user = UserRepository.get_user_by_id(id=id)
         if not user:
             return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
         db.session.delete(user)

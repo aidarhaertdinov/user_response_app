@@ -2,26 +2,21 @@ from flask import request
 
 class RegistrationLoginEntity:
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, username, permission):
         self.email = email
         self.password = password
+        self.username = username
+        self.permission = permission
 
     @staticmethod
     def request_json():
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
-        return email, password
+        user = request.get_json()
+        email = user.get('email')
+        password = user.get('password')
+        username = user.get('username')
+        permission = user.get('permission')
 
-    @staticmethod
-    def request_json_put():
-        data = request.get_json()
-        permission = data.get('permission')
-        if permission:
-            return permission
-        else:
-            return False
-
+        return RegistrationLoginEntity(email, password, username, permission)
 
     @staticmethod
     def email_password_validate(email: str, password: str) -> bool:

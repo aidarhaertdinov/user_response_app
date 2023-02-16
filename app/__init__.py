@@ -35,7 +35,7 @@ def create_app(config_name="development"):
     csrf.exempt(rest_v1)
     app.register_blueprint(rest_v1)
 
-    from repository.user_repository import UserRepository
+    from app.repository.user_repository import UserRepository
     global user_repository
     user_repository = UserRepository()
 

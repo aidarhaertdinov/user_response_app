@@ -7,10 +7,6 @@ from ..repository.user_repository import UserRepository
 from app import basic_auth, token_auth
 from config import Config
 
-#
-# @login_manager.user_loader
-# def load_user(user_id):
-#     return User.query.get(user_id)
 
 @basic_auth.verify_password
 def verify_password(email, password):
@@ -29,18 +25,6 @@ def verify_token(token):
         return user
     return False
 
-@auth.route('/registration', methods=['POST'])
-def registration():
-    data = RegistrationLoginEntity.request_json()
-    if RegistrationLoginEntity.email_password_validate(data.email, data.password) is False:
-        abort(400)
-    if UserRepository.get_user_by_email(email=data.email) is not None:
-            abort(400, description='Пользователь с данным email и password зарегистирован')
-    user = User(email=data.email, password=data.password)
-    db.session.add(user)
-    db.session.commit()
-
-    return jsonify({'email': user.email}), 201
 
 @auth.route('/login', methods=['POST'])
 def login():

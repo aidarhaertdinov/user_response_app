@@ -61,3 +61,6 @@ def add_created_date(mapper, connection, target):
 def lowercase(mapper, connection, target):
     target.email = target.email.lower()
 
+@event.listens_for(User, "before_insert")
+def capitalizecase(mapper, connection, target):
+    target.username = target.username.capitalize()

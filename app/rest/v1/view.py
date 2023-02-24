@@ -21,7 +21,7 @@ def create_user():
     return jsonify({'email': user.email}), 201
 
 @rest_v1.route("/users", methods=['GET'])
-# @multi_auth.login_required
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_users.yml')
 def get_users():
     try:
@@ -34,7 +34,7 @@ def get_users():
 
 
 @rest_v1.route("/users/<int:id>", methods=['GET'])
-# @multi_auth.login_required
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_user.yml')
 def get_user(id):
     try:
@@ -45,7 +45,7 @@ def get_user(id):
 
 
 @rest_v1.route("/users/<int:id>", methods=['PUT'])
-# @multi_auth.login_required
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/put_user.yml')
 def put_user(id):
     try:
@@ -65,7 +65,7 @@ def put_user(id):
 
 
 @rest_v1.route("/users/<int:id>", methods=['DELETE'])
-# @multi_auth.login_required
+@multi_auth.login_required
 @swag_from('swagger_schema/user_view/delete_user.yml')
 def delete_user(id):
     try:

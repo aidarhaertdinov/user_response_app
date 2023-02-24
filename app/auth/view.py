@@ -1,7 +1,5 @@
 from . import auth
-from app.model import User, db
 from flask import jsonify, current_app, abort
-from .. import login_manager
 from app.auth.registration_login_entity import RegistrationLoginEntity
 from ..repository.user_repository import UserRepository
 from app import basic_auth, token_auth

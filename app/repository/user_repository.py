@@ -2,7 +2,7 @@ from app.model import User
 
 class UserRepository:
 
-    def get_user_by_id(id: str) -> User:
+    def get_user_by_id(id:int) -> User:
         return User.query.filter_by(id=id).first()
 
 

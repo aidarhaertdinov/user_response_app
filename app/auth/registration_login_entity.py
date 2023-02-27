@@ -1,5 +1,6 @@
 from flask import request
 
+
 class RegistrationLoginEntity:
 
     def __init__(self, email, password, username, permission):

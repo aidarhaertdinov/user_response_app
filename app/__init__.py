@@ -30,7 +30,6 @@ def create_app(config_name="development"):
     moment.init_app(app)
     login_manager.init_app(app)
 
-
     from app.rest.v1 import rest_v1
     csrf.exempt(rest_v1)
     app.register_blueprint(rest_v1)

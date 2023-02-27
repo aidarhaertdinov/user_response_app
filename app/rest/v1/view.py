@@ -9,16 +9,18 @@ from app import multi_auth
 
 
 @rest_v1.route('/create_user', methods=['POST'])
+@multi_auth.login_required
 def create_user():
     data = RegistrationLoginEntity.request_json()
     if RegistrationLoginEntity.email_password_validate(data.email, data.password) is False:
         abort(400)
     if UserRepository.get_user_by_email(email=data.email) is not None:
-            abort(400, description='Пользователь с данным email и password зарегистирован')
-    user = User(email=data.email, password=data.password, username=data.username, permission=data.permission )
+        abort(400, description='Пользователь с данным email и password зарегистирован')
+    user = User(email=data.email, password=data.password, username=data.username, permission=data.permission)
     db.session.add(user)
     db.session.commit()
     return jsonify({'email': user.email}), 201
+
 
 @rest_v1.route("/users", methods=['GET'])
 @multi_auth.login_required

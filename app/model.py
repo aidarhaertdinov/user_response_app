@@ -21,7 +21,6 @@ class User(db.Model, UserMixin):
     permission = db.Column(db.Enum(Permissions))
     created_date = db.Column(db.DateTime(timezone=True), nullable=False)
 
-
     def __init__(self, email, password, username=None, permission=Permissions.USER):
         self.email = email
         self.username = username
@@ -57,9 +56,12 @@ class User(db.Model, UserMixin):
 @event.listens_for(User, "before_insert")
 def add_created_date(mapper, connection, target):
     target.created_date = moment.create(datetime.utcnow()).timestamp
+
+
 @event.listens_for(User, "before_insert")
 def lowercase(mapper, connection, target):
     target.email = target.email.lower()
+
 
 @event.listens_for(User, "before_insert")
 def capitalizecase(mapper, connection, target):

@@ -22,7 +22,7 @@ def add_token(token: str, current_user) -> dict:
 def decode_token(token, secret_key):
     try:
         s = TimedSerializer(secret_key)
-        data = s.loads(decoder(token), max_age=1000)
+        data = s.loads(decoder(token), max_age=1)
         return data
     except itsdangerous.exc.SignatureExpired:
         delete_token(token)

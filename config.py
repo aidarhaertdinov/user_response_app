@@ -1,9 +1,16 @@
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+
+load_dotenv()
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY') or os.urandom(32)
-    SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS') or False
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
 
 class DevelopmentConfig(Config):

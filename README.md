@@ -44,13 +44,13 @@ flask db init
 
 
 ```Python
-SECRET_KEY = os.getenv('SECRET_KEY') or os.urandom(32)
+SECRET_KEY = os.getenv('SECRET_KEY')
 ```
 - используют значение секретного ключа в качестве криптографического ключа, полезного для генерации подписей или токенов. [ссылка на документацию](https://explore-flask.readthedocs.io/en/latest/configuration.html)
 
 
 ```Python
-SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS') or False
+SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 ```
 - если установлен  `True`, то Flask-SQLAlchemy будет отслеживать изменения объектов и посылать сигналы. [ссылка на документацию](https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html)
 

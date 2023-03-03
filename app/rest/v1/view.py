@@ -3,13 +3,21 @@ from app.model import User, db
 from flask import jsonify
 from ..errors import errors
 from flasgger import swag_from
-from app.auth.registration_login_entity import RegistrationLoginEntity
+from app.auth.model import RegistrationLoginEntity
 from ...repository.user_repository import UserRepository
 from app import multi_auth
+from app import login_manager
+
+
+@login_manager.user_loader
+def load_user(id):
+
+    return UserRepository.get_user_by_id(id=id)
 
 
 @rest_v1.route('/create_user', methods=['POST'])
 @multi_auth.login_required
+@swag_from('swagger_schema/user_view/post_user.yml')
 def create_user():
     data = RegistrationLoginEntity.request_json()
     if RegistrationLoginEntity.email_password_validate(data.email, data.password) is False:
@@ -19,6 +27,7 @@ def create_user():
     user = User(email=data.email, password=data.password, username=data.username, permission=data.permission)
     db.session.add(user)
     db.session.commit()
+
     return jsonify({'email': user.email}), 201
 
 
@@ -26,6 +35,7 @@ def create_user():
 @multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_users.yml')
 def get_users():
+
     try:
         users = UserRepository.get_ordered_users(User.id)
         list_users = [user.to_json() for user in users]
@@ -39,9 +49,11 @@ def get_users():
 @multi_auth.login_required
 @swag_from('swagger_schema/user_view/get_user.yml')
 def get_user(id):
+
     try:
         user = UserRepository.get_user_by_id(id=id)
         return jsonify(user.to_json())
+
     except AttributeError:
         return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
 
@@ -50,6 +62,7 @@ def get_user(id):
 @multi_auth.login_required
 @swag_from('swagger_schema/user_view/put_user.yml')
 def put_user(id):
+
     try:
         data = RegistrationLoginEntity.request_json()
         user = UserRepository.get_user_by_id(id=id)
@@ -62,6 +75,7 @@ def put_user(id):
         db.session.add(user)
         db.session.commit()
         return jsonify(user.to_json())
+
     except AttributeError:
         return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
 
@@ -70,6 +84,7 @@ def put_user(id):
 @multi_auth.login_required
 @swag_from('swagger_schema/user_view/delete_user.yml')
 def delete_user(id):
+
     try:
         user = UserRepository.get_user_by_id(id=id)
         if not user:
@@ -77,5 +92,6 @@ def delete_user(id):
         db.session.delete(user)
         db.session.commit()
         return {'сообщение': 'пользователь удален'}
+
     except AttributeError:
         return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')

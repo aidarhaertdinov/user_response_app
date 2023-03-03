@@ -1,10 +1,9 @@
 # user_response_app
 
 
-## Что делает проект
+## Назначение проекта
 
-Проект преставляет собой backend часть, который осуществляет ответы на запрос от другого приложения (чтобы клонировать приложение user_request_app
-)
+Приложение преставляет собой backend, который осуществляет ответы на запросы от user_request_app
 
 ```Bash 
 git clone https://github.com/aidarhaertdinov/user_request_app.git
@@ -43,18 +42,11 @@ flask db init
 ## Используемые Конфигураций (Config)
 
 
-```Python
-SECRET_KEY = os.getenv('SECRET_KEY')
-```
-- используют значение секретного ключа в качестве криптографического ключа, полезного для генерации подписей или токенов. [ссылка на документацию](https://explore-flask.readthedocs.io/en/latest/configuration.html)
+**SECRET_KEY = os.getenv('SECRET_KEY')** - используют значение секретного ключа в качестве криптографического ключа, полезного для генерации подписей или токенов. [ссылка на документацию](https://explore-flask.readthedocs.io/en/latest/configuration.html)
+
+**SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')** - если установлен  `True`, то Flask-SQLAlchemy будет отслеживать изменения объектов и посылать сигналы. [ссылка на документацию](https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html)
 
 
-```Python
-SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
-```
-- если установлен  `True`, то Flask-SQLAlchemy будет отслеживать изменения объектов и посылать сигналы. [ссылка на документацию](https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html)
-
-
-
+**Swagger доступен по ссылке** [ссылка на swagger] (http://localhost:5000/apidocs/)
 
 

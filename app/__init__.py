@@ -8,7 +8,6 @@ from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from flask_httpauth import HTTPTokenAuth, HTTPBasicAuth, MultiAuth
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 swagger = Swagger()
@@ -20,6 +19,7 @@ token_auth = HTTPTokenAuth('Bearer')
 multi_auth = MultiAuth(basic_auth, token_auth)
 
 user_repository = None
+
 
 def create_app(config_name="development"):
     app = Flask(__name__)

@@ -10,7 +10,9 @@ definitions:
     properties:
       id:
         type: integer
-      user_name:
+      email:
+        type: string
+      username:
         type: string
       permission:
         type: string
@@ -22,6 +24,7 @@ responses:
       $ref: '#/definitions/User'
     examples:
       user: {"id": 14,
-            "user_name": "aidar123@mail.ru",
-            "permission": "MODERATE"
+            "email": "aidar123@mail.ru",
+            "username": "Айдар",
+            "permission": "MODERATE",
       }

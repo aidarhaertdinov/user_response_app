@@ -1,6 +1,6 @@
 from . import auth
 from flask import jsonify, current_app, abort
-from app.auth.registration_login_entity import RegistrationLoginEntity
+from app.auth.model import RegistrationLoginEntity
 from ..repository.user_repository import UserRepository
 from app import basic_auth, token_auth
 
@@ -10,6 +10,7 @@ def verify_password(email, password):
     user = UserRepository.get_user_by_email(email=email)
     if not user or not user.verify_password(password):
         return False
+
     return user.email
 
 
@@ -22,6 +23,7 @@ def verify_token(token):
     if data['id'] in current_app.config:
         user = UserRepository.get_user_by_id(id=data['id'])
         return user
+
     return False
 
 
@@ -35,4 +37,5 @@ def login():
         abort(400)
     token = create_token(user=user, secret_key=current_app.config.get('SECRET_KEY'))
     add_token(token, user)
+
     return jsonify({'id': user.id, 'token': token}), 201

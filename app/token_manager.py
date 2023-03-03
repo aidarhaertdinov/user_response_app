@@ -11,19 +11,23 @@ def create_token(user, secret_key: str) -> str:
         'email': user.email
     })
     token = base64.b64encode(str_payload.encode('ascii'))
+
     return token.decode('ascii')
 
 
 def add_token(token: str, current_user) -> dict:
     current_app.config[current_user.id] = token
+
     return current_app.config
 
 
 def decode_token(token, secret_key):
+
     try:
         s = TimedSerializer(secret_key)
         data = s.loads(decoder(token), max_age=1)
         return data
+
     except itsdangerous.exc.SignatureExpired:
         delete_token(token)
         abort(400, description='Срок действия подписи истек. Пожалуйста, войдите в систему еще раз')
@@ -34,20 +38,13 @@ def delete_token(token):
         if value == token:
             del current_app.config[key]
             break
+
     return current_app.config
-
-
-# TODO метод не рабочий
-# def delete_token(token):
-#     try:
-#         list(current_app.config.values()).remove(token)
-#         return True
-#     except ValueError:
-#         return False
 
 
 def decoder(base64_message):
     base64_bytes = base64_message.encode('ascii')
     message_bytes = base64.b64decode(base64_bytes)
     message = message_bytes.decode('ascii')
+
     return message

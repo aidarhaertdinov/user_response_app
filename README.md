@@ -41,13 +41,13 @@ flask db init
 
 ## Используемые Конфигураций (Config)
 
-### Все конфигурации окружения представлены в `.env` файле
+### Все переменные окружения представлены в `.env` файле
 
 `SECRET_KEY = os.getenv('SECRET_KEY')` - используют значение секретного ключа в качестве криптографического ключа, полезного для генерации подписей или токенов. [ссылка на документацию](https://explore-flask.readthedocs.io/en/latest/configuration.html)
 
 `SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')` - если установлен  `True`, то Flask-SQLAlchemy будет отслеживать изменения объектов и посылать сигналы. [ссылка на документацию](https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html)
 
 
-`Swagger доступен по ссылке` [ссылка на swagger] (http://localhost:5000/apidocs/)
+`Endpoint Swagger - /apidocs`
 
 

@@ -49,5 +49,14 @@ flask db init
 
 
 `Endpoint Swagger - /apidocs`
+ 
+login Swagger: `swagger@mail.ru`
+
+password Swagger: `swagger123`
+
+P.S. `.env` файла не должно быть в репозитории. Сохранен для того чтобы, другой человек мог использовать приложение.
+Никаких учетных записей не должно быть.
+
+
 
 

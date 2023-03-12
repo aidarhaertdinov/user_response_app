@@ -25,7 +25,7 @@ def decode_token(token, secret_key):
 
     try:
         s = TimedSerializer(secret_key)
-        data = s.loads(decoder(token), max_age=1)
+        data = s.loads(decoder(token), max_age=3000)
         return data
 
     except itsdangerous.exc.SignatureExpired:

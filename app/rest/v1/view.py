@@ -1,6 +1,6 @@
 from . import rest_v1
 from app.model import User, db
-from flask import jsonify
+from flask import jsonify, abort
 from ..errors import errors
 from flasgger import swag_from
 from app.auth.model import RegistrationLoginEntity
@@ -28,7 +28,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({'email': user.email}), 201
+    return jsonify(user.to_json()), 201
 
 
 @rest_v1.route("/users", methods=['GET'])

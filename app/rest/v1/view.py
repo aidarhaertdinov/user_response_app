@@ -91,7 +91,7 @@ def delete_user(id):
             return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
         db.session.delete(user)
         db.session.commit()
-        return {'сообщение': 'пользователь удален'}
+        return jsonify(user.to_json())
 
     except AttributeError:
         return jsonify(errors.get('UserNotFound')), errors.get('UserNotFound').get('status')
